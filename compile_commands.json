@@ -1,0 +1,48 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-c",
+      "-g3",
+      "-DDEBUG=1",
+      "-O3",
+      "-std=gnu99",
+      "-fstack-protector-all",
+      "-Wstack-protector",
+      "-Wall",
+      "-Wextra",
+      "-pedantic",
+      "-I",
+      "include",
+      "-o",
+      "lib/cypherAES.o",
+      "src/cypherAES.c"
+    ],
+    "directory": "/home/bix/Documents/trabalhos/Security",
+    "file": "/home/bix/Documents/trabalhos/Security/src/cypherAES.c",
+    "output": "/home/bix/Documents/trabalhos/Security/lib/cypherAES.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-c",
+      "-g3",
+      "-DDEBUG=1",
+      "-O3",
+      "-std=gnu99",
+      "-fstack-protector-all",
+      "-Wstack-protector",
+      "-Wall",
+      "-Wextra",
+      "-pedantic",
+      "-I",
+      "include",
+      "-o",
+      "lib/main.o",
+      "src/main.c"
+    ],
+    "directory": "/home/bix/Documents/trabalhos/Security",
+    "file": "/home/bix/Documents/trabalhos/Security/src/main.c",
+    "output": "/home/bix/Documents/trabalhos/Security/lib/main.o"
+  }
+]
