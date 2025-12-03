@@ -79,7 +79,7 @@ CFLAGS := -O3 $(STD) $(STACK) $(WARNS) -I include
 DEBUG := -g3 -DDEBUG=1
 
 # Dependency libraries
-LIBS := # -lm  -I some/path/to/library
+LIBS := -lssl -lcrypto
 
 # Test libraries
 TEST_LIBS := -l cmocka -L /usr/lib
