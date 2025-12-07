@@ -1,52 +1,85 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <openssl/rand.h>
-#include "cypherAES.h"
+#include "../include/rsa.h"
+#include "../include/cypherAES.h"
+#include "../include/blowfish.h"
 
-// --- TEMPORARY TEST CODE START ---
-#define AES_KEY_SIZE 32 // AES-256
-#define AES_IV_SIZE 16
+/*
+ * ============================================================================
+ *
+ *       Filename:  main.c
+ *
+ *    Description:  Algoritmos RSA, AES e Blowfish demonstrados e seus respectivos tempos analisados
+ *
+ *         Authors: Milena Bueno, Miguel Medina, Bruno dos Santos 
+ *
+ * ============================================================================
+ */
 
-int
-main (int argc, char* argv[])
-{
-    const char* input_file = "input.txt";
-    const char* encrypted_file = "encrypted.aes";
-    const char* decrypted_file = "decrypted.txt";
-
-    unsigned char key[AES_KEY_SIZE];
-    unsigned char iv[AES_IV_SIZE];
-
-    // Generate random key and IV
-    if (!RAND_bytes(key, sizeof(key)) || !RAND_bytes(iv, sizeof(iv))) {
-        fprintf(stderr, "ERROR: Failed to generate random key/IV.\n");
-        return EXIT_FAILURE;
+void compression_ratio(const char *algorithm, const char *operation, long file_size_bytes, double time_seconds) {
+    if (time_seconds <= 0) {
+        printf("%s %s: tempo muito pequeno para medir\n", algorithm, operation);
+        return;
     }
-
-    printf("--- AES Functionality Test ---\n");
-
-    // Test encryption and timing
-    double time_taken = aes_time_encrypt(input_file, encrypted_file, key, iv);
-    long size = file_size(input_file);
-
-    if (size == -1 || time_taken < 0) {
-        fprintf(stderr, "ERROR: Encryption test failed.\n");
-        return EXIT_FAILURE;
-    }
-
-    printf("Input File: %s\n", input_file);
-    printf("File Size: %ld bytes\n", size);
-    printf("Encryption Time: %f seconds\n", time_taken);
-    printf("Encrypted output: %s\n", encrypted_file);
-
-    // Test decryption for verification
-    printf("\nAttempting to decrypt '%s' to '%s' for verification...\n", encrypted_file, decrypted_file);
-    aes_decrypt_file(encrypted_file, decrypted_file, key, iv);
-    printf("Decryption complete. Please compare '%s' and '%s' to verify correctness.\n", input_file, decrypted_file);
-
-    printf("\n--- Test Complete ---\n");
-
-    return EXIT_SUCCESS;
+    
+    double bytes_per_sec = file_size_bytes / time_seconds;
+    double kb_per_sec = bytes_per_sec / 1024.0;
+    double mb_per_sec = kb_per_sec / 1024.0;
+    
+    printf("%s %s:\n", algorithm, operation);
+    printf("  Tempo: %.4f s\n", time_seconds);
+    printf("  Taxa: %.2f bytes/s\n", bytes_per_sec);
+    printf("  Taxa: %.2f KB/s\n", kb_per_sec);
+    printf("  Taxa: %.2f MB/s\n", mb_per_sec);
 }
-// --- TEMPORARY TEST CODE END ---
 
+int main(int argc, char *argv[]) {
+
+    if (argc < 8){
+        printf("Uso:  %s <arquivo> <public.pem> <private.pem> <aes.key> <aes_iv.bin> <blowfish_key.bin> <blowfish_iv.bin>\n", argv[0]);
+        return 1;
+    }
+    
+    const char *input = argv[1];
+    const char *pub = argv[2];
+    const char *priv = argv[3];
+    const char *key_aes = argv[4];
+    const char *iv_aes = argv[5];
+    const char *key_bf = argv[6];
+    const char * iv_bf = argv[7];
+
+    long file_size = size(input);
+    printf("tam arquivo original: %ld MB\n", file_size);
+
+    printf("=====================================\n\n");
+
+    double t_enc_rsa = rsa_time_encrypt(input, "arquivo_RSA.enc", pub);
+    double t_dec_rsa = rsa_time_decrypt("arquivo_RSA.enc", "arquivo_RSA.dec", priv);
+    
+    double t_enc_aes = aes_time_encrypt(input, "arquivo_AES.enc", key_aes, iv_aes);
+    double t_dec_aes = aes_time_decrypt("arquivo_AES.enc", "arquivo_AES.dec", key_aes, iv_aes);
+
+    double t_enc_bf = blowfish_time_encrypt(input, "arquivo_BF.enc", key_bf, iv_bf);
+    double t_dec_bf = blowfish_time_decrypt("arquivo_BF.enc", "arquivo_BF.dec", key_bf, iv_bf);
+
+    compression_ratio("RSA", "Encrypt", file_size, t_enc_rsa);
+    printf("\n");
+    compression_ratio("RSA", "Decrypt", file_size, t_dec_rsa);
+    printf("\n");
+
+    printf("=====================================\n\n");
+
+    compression_ratio("AES", "Encrypt", file_size, t_enc_aes);
+    printf("\n");
+    compression_ratio("AES", "Decrypt", file_size, t_dec_aes);
+    printf("\n");
+
+    printf("=====================================\n\n");
+
+    compression_ratio("Blowfish", "Encrypt", file_size, t_enc_bf);
+    printf("\n");
+    compression_ratio("Blowfish", "Decrypt", file_size, t_dec_bf);
+    printf("\n");
+    
+    return 0;
+}

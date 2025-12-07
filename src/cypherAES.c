@@ -1,23 +1,17 @@
 #include <openssl/evp.h>
+#include <openssl/err.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "cypherAES.h"
 
 #define BUFFER_SIZE 4096
 
-void 
-handle_errors()
-{
-    fprintf(stderr, "An error occurred in an OpenSSL function.\n");
-    abort();
+void handle_errors() {
+    ERR_print_errors_fp(stderr);
+    exit(1);
 }
 
-void 
-aes_encrypt_file
-(const char *input_file, const char *output_file,
- const unsigned char *key, const unsigned char *iv)
-{
+void aes_encrypt_file (const char *input_file, const char *output_file, const unsigned char *key, const unsigned char *iv) {
     FILE *in = fopen(input_file, "rb");
     if (!in) {
         perror("Failed to open input file");
@@ -62,11 +56,7 @@ aes_encrypt_file
     fclose(out);
 }
 
-void 
-aes_decrypt_file
-(const char *input_file, const char *output_file,
- const unsigned char *key, const unsigned char *iv)
-{
+void aes_decrypt_file (const char *input_file, const char *output_file, const unsigned char *key, const unsigned char *iv) {
     FILE *in = fopen(input_file, "rb");
     if (!in) {
         perror("Failed to open input file");
@@ -111,38 +101,22 @@ aes_decrypt_file
     fclose(out);
 }
 
-
-long 
-file_size
-(const char *filename)
-{
-    FILE *f = fopen(filename, "rb");
-    if (f == NULL) {
-        perror("Failed to open file to get size");
-        return -1;
-    }
-    fseek(f, 0, SEEK_END);
-    long size = ftell(f);
-    fclose(f);
-    return size;
-}
-
-double
-time_now()
-{
+double time_now_aes() {
     return (double)clock() / CLOCKS_PER_SEC;
 }
 
-double
-aes_time_encrypt
-(const char *input, const char *output,
- const unsigned char *key, const unsigned char *iv)
-{
-    double start_time = time_now();
+double aes_time_encrypt (const char *input, const char *output, const unsigned char *key, const unsigned char *iv) {
+    double start_time = time_now_aes();
     aes_encrypt_file(input, output, key, iv);
-    double end_time = time_now();
+    double end_time = time_now_aes();
     return end_time - start_time;
 }
 
+double aes_time_decrypt(const char *input, const char *output, const unsigned char *key, const unsigned char *iv){
+    double start_time = time_now_aes();
+    aes_decrypt_file(input, output, key, iv);
+    double end_time = time_now_aes();
+    return end_time - start_time;
+}
 
 
