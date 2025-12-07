@@ -1,5 +1,6 @@
 #include <openssl/evp.h>
 #include <openssl/err.h>
+#include <openssl/provider.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,10 +8,32 @@
 
 #define BUFFER_SIZE 4096
 
-// void // error(); {
-//     ERR_print_errors_fp(stderr);
-//     exit(1);
-// }
+static OSSL_PROVIDER *legacy_provider = NULL;
+static OSSL_PROVIDER *default_provider = NULL;
+
+void init_openssl_providers() {
+    legacy_provider = OSSL_PROVIDER_load(NULL, "legacy");
+    if (!legacy_provider) 
+        ERR_print_errors_fp(stderr);
+    
+    default_provider = OSSL_PROVIDER_load(NULL, "default");
+    if (!default_provider) 
+        ERR_print_errors_fp(stderr);
+}
+
+void cleanup_openssl_providers() {
+    if (legacy_provider) {
+        OSSL_PROVIDER_unload(legacy_provider);
+    }
+    if (default_provider) {
+        OSSL_PROVIDER_unload(default_provider);
+    }
+}
+
+void error_bf() {
+    ERR_print_errors_fp(stderr);
+    exit(1);
+}
 
 int blowfish_encrypt_file(const char *input_file, const char *output_file,  const unsigned char *key, const unsigned char *iv) {
     FILE *in = fopen(input_file, "rb");
@@ -33,16 +56,16 @@ int blowfish_encrypt_file(const char *input_file, const char *output_file,  cons
     unsigned char out_buf[BUFFER_SIZE + EVP_MAX_BLOCK_LENGTH];
 
     if (!(ctx = EVP_CIPHER_CTX_new())) {
-        // error();;
+        error_bf();
     }
 
     if (1 != EVP_EncryptInit_ex(ctx, EVP_bf_cbc(), NULL, key, iv)) {
-        // error();;
+        error_bf();
     }
 
     while ((len = fread(in_buf, 1, BUFFER_SIZE, in)) > 0) {
         if (1 != EVP_EncryptUpdate(ctx, out_buf, &ciphertext_len, in_buf, len)) {
-            // error();;
+            error_bf();
         }
         if (fwrite(out_buf, 1, ciphertext_len, out) != (size_t)ciphertext_len) {
             perror("Failed to write to output file");
@@ -54,7 +77,7 @@ int blowfish_encrypt_file(const char *input_file, const char *output_file,  cons
     }
 
     if (1 != EVP_EncryptFinal_ex(ctx, out_buf, &ciphertext_len)) {
-        // error();;
+        error_bf();
     }
     if (fwrite(out_buf, 1, ciphertext_len, out) != (size_t)ciphertext_len) {
         perror("Failed to write to output file");
@@ -91,16 +114,16 @@ int blowfish_decrypt_file(const char *input_file, const char *output_file, const
     unsigned char out_buf[BUFFER_SIZE + EVP_MAX_BLOCK_LENGTH];
 
     if (!(ctx = EVP_CIPHER_CTX_new())) {
-        // error();;
+        error_bf();
     }
 
     if (1 != EVP_DecryptInit_ex(ctx, EVP_bf_cbc(), NULL, key, iv)) {
-        // error();;
+        error_bf();
     }
 
     while ((len = fread(in_buf, 1, BUFFER_SIZE, in)) > 0) {
         if (1 != EVP_DecryptUpdate(ctx, out_buf, &plaintext_len, in_buf, len)) {
-            // error();;
+            error_bf();
         }
         if (fwrite(out_buf, 1, plaintext_len, out) != (size_t)plaintext_len) {
             perror("Failed to write to output file");
@@ -112,7 +135,7 @@ int blowfish_decrypt_file(const char *input_file, const char *output_file, const
     }
 
     if (1 != EVP_DecryptFinal_ex(ctx, out_buf, &plaintext_len))
-        // error();;
+        error_bf();
     
     if (fwrite(out_buf, 1, plaintext_len, out) != (size_t)plaintext_len) {
         perror("Failed to write to output file");

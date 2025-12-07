@@ -39,6 +39,9 @@ int main(int argc, char *argv[]) {
         printf("Uso:  %s <arquivo> <public.pem> <private.pem> <aes.key> <aes_iv.bin> <blowfish_key.bin> <blowfish_iv.bin>\n", argv[0]);
         return 1;
     }
+
+    init_openssl_providers();
+
     
     const char *input = argv[1];
     const char *pub = argv[2];
@@ -49,7 +52,7 @@ int main(int argc, char *argv[]) {
     const char * iv_bf = argv[7];
 
     long file_size = size(input);
-    printf("tam arquivo original: %ld MB\n", file_size);
+    printf("tam arquivo original: %0.f MB\n", (double)file_size / (1024 * 1024));
 
     printf("=====================================\n\n");
 
@@ -81,5 +84,6 @@ int main(int argc, char *argv[]) {
     compression_ratio("Blowfish", "Decrypt", file_size, t_dec_bf);
     printf("\n");
     
+    init_openssl_providers();
     return 0;
 }

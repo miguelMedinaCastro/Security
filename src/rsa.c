@@ -185,7 +185,7 @@ double rsa_time_decrypt(const char *input, const char *output, const char *priv_
 }
 
 long size(const char *input){
-    long int aux, tam;
+    long int tam;
 
     FILE *file = fopen(input, "rb");
     if (file == NULL)
@@ -193,10 +193,10 @@ long size(const char *input){
 
     fseek(file, 0L, SEEK_END);
 
-    aux = ftell(file);
+    tam = ftell(file);
     fclose(file);
 
-    tam = (double)aux / (1024 * 1024);
+    // tam = (double)aux / (1024 * 1024);
     
     return tam;
 }
