@@ -5,10 +5,10 @@
 openssl genrsa -out private.pem 2048
 openssl rsa -in private.pem -pubout -out public.pem
 
-# Gerar chave AES e IV
+## Gerar chave AES e IV
 openssl rand -out aes_key.bin 32
 openssl rand -out aes_iv.bin 16
 
-# Gerar chave Blowfish e IV 
+## Gerar chave Blowfish e IV 
 openssl rand -out blowfish_key.bin 16
 openssl rand -out blowfish_iv.bin 8
