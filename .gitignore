@@ -44,3 +44,9 @@
 !/log/.gitkeep
 
 chaves_geradas.txt
+
+*.bin
+*.pem
+.cache/
+arquivo_*.enc
+arquivo_*.dec

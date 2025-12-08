@@ -65,6 +65,11 @@ int main(int argc, char *argv[]) {
     double t_enc_bf = blowfish_time_encrypt(input, "arquivo_BF.enc", key_bf, iv_bf);
     double t_dec_bf = blowfish_time_decrypt("arquivo_BF.enc", "arquivo_BF.dec", key_bf, iv_bf);
 
+    double media_encrypt = t_enc_aes + t_enc_rsa + t_enc_bf / 3.0;
+
+    double media_dencrypt = t_dec_aes + t_dec_rsa + t_dec_bf / 3.0;
+
+
     compression_ratio("RSA", "Encrypt", file_size, t_enc_rsa);
     printf("\n");
     compression_ratio("RSA", "Decrypt", file_size, t_dec_rsa);
@@ -84,6 +89,39 @@ int main(int argc, char *argv[]) {
     compression_ratio("Blowfish", "Decrypt", file_size, t_dec_bf);
     printf("\n");
     
+    printf("=====================================\n\n");
+    printf("Average time to encrypt: %.4f\n",media_encrypt);
+    printf("Average time to decrypt: %.4f",media_dencrypt);
+
+
+
     init_openssl_providers();
+
+    
     return 0;
 }
+
+
+
+float get_average(float *list, size_t n)
+{
+    float sum = 0.0f;
+
+    for (size_t i = 0; i < n; i++)
+        sum += list[i];
+
+    return sum / n;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
