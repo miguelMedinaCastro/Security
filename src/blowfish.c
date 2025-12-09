@@ -1,3 +1,5 @@
+#define _POSIX_C_SOURCE 199309L
+
 #include <openssl/evp.h>
 #include <openssl/err.h>
 #include <openssl/provider.h>
@@ -152,7 +154,10 @@ int blowfish_decrypt_file(const char *input_file, const char *output_file, const
 }
 
 double time_now_blowfish() {
-    return (double)clock() / CLOCKS_PER_SEC;
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+
+    return ts.tv_sec + ts.tv_nsec / 1e9;
 }
 
 double blowfish_time_encrypt(const char *input, const char *output, const unsigned char *key, const unsigned char *iv) {
