@@ -13,7 +13,7 @@ openssl rand -out aes_iv.bin 16
 openssl rand -out blowfish_key.bin 16
 openssl rand -out blowfish_iv.bin 8
 
-##instruções para rodar o código
+## instruções para rodar o código
 depois de rodar os comandos acima para gerar as chaves, basta rodar: ./bin/binary arquivo_1MB.bin public.pem private.pem aes_key.bin aes_iv.bin blowfish_key.bin blowfish_iv.bin
 as chaves já estão inclusas para testar mas pra testar com tamanhos de chaves diferentes só lançar os comandos de chaves acima novamente e alterar os tamanhos.
  
